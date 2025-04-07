@@ -1,0 +1,11 @@
+caption_train2017.json
+caption_val2017.json
+.DS_Store
+__pycache__
+__MACOSX
+.idea
+.vscode
+.env
+.env.local
+.env.development.local
+.env.test.local
