@@ -1,5 +1,5 @@
-caption_train2017.json
-caption_val2017.json
+./annotations/caption_train2017.json
+./annotations/caption_val2017.json
 .DS_Store
 __pycache__
 __MACOSX
