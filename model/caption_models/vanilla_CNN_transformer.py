@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 from ..decoder.transformer_decoder_layer import TransformerDecoder
-from ..encoder.CNN_encoder import CNN_encoder
+from ..encoder.CNN_encoder import CNNEncoder
 
 class CNNTransformerCaptioningModel(nn.Module):
     def __init__(self, vocab_size, embed_dim=512, num_heads=8, num_layers=6, max_len=50, dropout=0.1, pad_idx=0):
         super().__init__()
-        self.encoder = CNN_encoder(embed_dim=embed_dim)
+        self.encoder = CNNEncoder(embed_dim=embed_dim)
         self.decoder = TransformerDecoder(vocab_size, embed_dim, num_heads, num_layers, max_len, dropout)
         self.max_len = max_len
         self.pad_idx = pad_idx
