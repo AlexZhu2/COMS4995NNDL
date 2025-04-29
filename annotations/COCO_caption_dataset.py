@@ -152,7 +152,7 @@ class COCOCaptionDataset(Dataset):
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     # Path to the COCO captions JSON file
-    json_path = 'captions_train2017.json'
+    json_path = 'annotations/captions_train2017.json'
     dataset = COCOCaptionDataset(json_path)
     
     # Print dataset statistics
@@ -160,13 +160,13 @@ if __name__ == "__main__":
     
     # Get one sample
     sample = dataset[0]
-    # print(f"Image shape: {sample['image'].shape}")
-    # print(f"Input IDs shape: {sample['input_ids'].shape}")
-    # print(f"Attention mask shape: {sample['attention_mask'].shape}")
-    # print(f"Attention mask: {sample['attention_mask']}")
-    # print(f"\nRaw caption: {sample['raw_caption']}")
-    # print(f"Tokenized and decoded caption: {dataset.decode(sample['input_ids'])}")
-    # print(f"Vocabulary size: {len(dataset.vocab)}")
+    print(f"Image shape: {sample['image'].shape}")
+    print(f"Input IDs shape: {sample['input_ids'].shape}")
+    print(f"Attention mask shape: {sample['attention_mask'].shape}")
+    print(f"Attention mask: {sample['attention_mask']}")
+    print(f"\nRaw caption: {sample['raw_caption']}")
+    print(f"Tokenized and decoded caption: {dataset.decode(sample['input_ids'])}")
+    print(f"Vocabulary size: {len(dataset.vocab)}")
     
     # Visualize the image
     image = sample['image']
