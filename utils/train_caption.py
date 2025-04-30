@@ -4,8 +4,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from ..annotations import COCOCaptionDataset  # Assume your dataset class is saved here
-from ..model.caption_models.vanilla_CNN_transformer import CNNTransformerCaptioningModel
+from annotations.COCO_caption_dataset import COCOCaptionDataset  # Assume your dataset class is saved here
+from model.caption_models.vanilla_CNN_transformer import CNNTransformerCaptioningModel
 
 # ------------------------- Config -------------------------
 BATCH_SIZE = 32

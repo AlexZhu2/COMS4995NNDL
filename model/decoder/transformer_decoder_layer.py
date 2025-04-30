@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from positional_encoding import SinusoidalPositionalEncoding
+from model.decoder.positional_encoding import SinusoidalPositionalEncoding
 
 class TransformerDecoder(nn.Module):
     def __init__(self, vocab_size, embed_dim=512, num_heads=8, num_layers=6, max_len=50, dropout=0.1):
