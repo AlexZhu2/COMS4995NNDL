@@ -14,53 +14,60 @@ from io import BytesIO
 import requests
 
 class COCOCaptionDataset(Dataset):
-    def __init__(self, json_path, image_root, transform=None, max_length=50):
-        '''
-        Args:
-            json_path (str): Path to the COCO captions JSON file
-            image_root (str): Directory containing the COCO images (e.g. 'train2017/')
-            transform (callable, optional): Transform to apply to images
-            max_length (int): Maximum tokenized caption length
-        '''
-        with open(json_path, 'r') as f:
-            self.data = json.load(f)
+    def __init__(self, json_path, image_root, transform=None, max_length=50, vocab=None):
+      '''
+      Args:
+          json_path (str): Path to the COCO captions JSON file
+          image_root (str): Directory containing the COCO images
+          transform (callable, optional): Transform to apply to images
+          max_length (int): Maximum tokenized caption length
+          vocab (torchtext.vocab.Vocab, optional): Pre-built vocabulary to reuse
+      '''
+      with open(json_path, 'r') as f:
+          self.data = json.load(f)
 
-        self.image_root = image_root
-        self.max_length = max_length
-        self.tokenizer = get_tokenizer('basic_english')
+      self.image_root = image_root
+      self.max_length = max_length
+      self.tokenizer = get_tokenizer('basic_english')
 
-        # Map image_id to metadata + captions
-        self.image_dict = {}
-        for img in self.data['images']:
-            self.image_dict[img['id']] = {
-                'file_name': img['file_name'],
-                'flickr_url': img.get('flickr_url', None),
-                'captions': []
-            }
+      # Map image_id to metadata + captions
+      self.image_dict = {}
+      for img in self.data['images']:
+          self.image_dict[img['id']] = {
+              'file_name': img['file_name'],
+              'flickr_url': img.get('flickr_url', None),
+              'captions': []
+          }
 
-        all_captions = []
-        for ann in self.data['annotations']:
-            caption = ann['caption']
-            self.image_dict[ann['image_id']]['captions'].append(caption)
-            all_captions.append(caption)
+      all_captions = []
+      for ann in self.data['annotations']:
+          caption = ann['caption']
+          self.image_dict[ann['image_id']]['captions'].append(caption)
+          all_captions.append(caption)
 
-        print("Building vocabulary...")
-        self.vocab = self._build_vocabulary(all_captions)
-        print(f"Vocabulary size: {len(self.vocab)}")
+      # ---- MODIFY HERE ----
+      if vocab is None:
+          print("Building vocabulary...")
+          self.vocab = self._build_vocabulary(all_captions)
+          print(f"Vocabulary size: {len(self.vocab)}")
+      else:
+          print("Using provided vocabulary")
+          self.vocab = vocab
+      # ---------------------
 
-        self.image_ids = list(self.image_dict.keys())
+      self.image_ids = list(self.image_dict.keys())
 
-        self.transform = transform if transform else transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])
-        ])
+      self.transform = transform if transform else transforms.Compose([
+          transforms.Resize((224, 224)),
+          transforms.ToTensor(),
+          transforms.Normalize(mean=[0.485, 0.456, 0.406],
+                              std=[0.229, 0.224, 0.225])
+      ])
 
-        self.pad_idx = self.vocab['<pad>']
-        self.unk_idx = self.vocab['<unk>']
-        self.start_idx = self.vocab['<start>']
-        self.end_idx = self.vocab['<end>']
+      self.pad_idx = self.vocab['<pad>']
+      self.unk_idx = self.vocab['<unk>']
+      self.start_idx = self.vocab['<start>']
+      self.end_idx = self.vocab['<end>']
 
     def _yield_tokens(self, data_iter: List[str]) -> Iterator[List[str]]:
         for text in data_iter:
