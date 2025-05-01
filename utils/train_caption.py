@@ -40,10 +40,12 @@ train_transform = transforms.Compose([
 ])
 
 # ------------------------- Dataset -------------------------
-train_dataset = COCOCaptionDataset('captions_train2017.json', image_root='train2017', max_length=MAX_LEN, transform=train_transform)
-val_dataset = COCOCaptionDataset('captions_val2017.json', image_root='val2017', max_length=MAX_LEN, transform=val_transform)
-
+train_dataset = COCOCaptionDataset('captions_train2017.json', image_root='train2017', max_length=MAX_LEN, transform=train_transform, vocab=None)
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+
+vocab = train_dataset.vocab
+
+val_dataset = COCOCaptionDataset('captions_val2017.json', image_root='val2017', max_length=MAX_LEN, transform=val_transform, vocab=vocab)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False)
 
 VOCAB_SIZE = len(train_dataset.vocab)
@@ -110,6 +112,7 @@ for epoch in range(EPOCHS):
             logits = model(images, tgt_input)
             loss = criterion(logits.reshape(-1, VOCAB_SIZE), tgt_output.reshape(-1))
             total_val_loss += loss.item()
+            val_progress.set_postfix(loss=loss.item())
 
             if i == val_sample_idx:
                 pred_ids = torch.argmax(logits[0], dim=-1).cpu()
