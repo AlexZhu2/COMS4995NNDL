@@ -38,7 +38,7 @@ train_transform = transforms.Compose([
 
 # ------------------------- Dataset -------------------------
 train_dataset = COCOCaptionDataset(
-    'captions_train2017.json',
+    'annotations/captions_train2017.json',
     image_root='train2017',
     max_length=MAX_LEN,
     transform=train_transform,
@@ -49,7 +49,7 @@ train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 vocab = train_dataset.vocab
 
 val_dataset = COCOCaptionDataset(
-    'captions_val2017.json',
+    'annotations/captions_val2017.json',
     image_root='val2017',
     max_length=MAX_LEN,
     transform=val_transform,

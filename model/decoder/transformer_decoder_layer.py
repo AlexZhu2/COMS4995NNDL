@@ -5,7 +5,7 @@ from transformers import BartForConditionalGeneration
 class TransformerDecoder(nn.Module):
     def __init__(
             self,
-            pretrained_model_name: str = "facebook/bart-based",
+            pretrained_model_name: str = "facebook/bart-base",
             memory_dim: int = 512,
             freeze_encoder: bool = True
     ):
