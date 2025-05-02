@@ -37,6 +37,7 @@ class CNNBARTCaptioningModel(nn.Module):
         self,
         images: torch.Tensor,
         captions: torch.LongTensor,
+        decoder_attention_mask=None,
         memory_attention_mask: torch.BoolTensor = None
     ) -> torch.FloatTensor:
         """
@@ -58,7 +59,8 @@ class CNNBARTCaptioningModel(nn.Module):
             tgt_ids               = captions,
             memory                = memory,
             memory_attention_mask = memory_attention_mask,
-            use_cache             = False
+            use_cache             = False,
+            decoder_attention_mask=decoder_attention_mask
         )
         return logits
 
