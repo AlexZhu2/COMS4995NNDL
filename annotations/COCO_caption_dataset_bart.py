@@ -17,7 +17,8 @@ class COCOCaptionDataset(Dataset):
         image_root: str,
         transform=None,
         max_length: int = 35,
-        tokenizer: Optional[BartTokenizer] = None
+        tokenizer: Optional[BartTokenizer] = None,
+        eval: bool = False
     ):
         """
         Args:
@@ -29,7 +30,7 @@ class COCOCaptionDataset(Dataset):
         """
         with open(json_path, 'r') as f:
             self.data = json.load(f)
-
+        self.eval = eval
         self.image_root = image_root
         self.max_length = max_length
 
@@ -111,13 +112,20 @@ class COCOCaptionDataset(Dataset):
 
         image = self.transform(image)
 
-        caption = random.choice(info['captions']) if info['captions'] else ""
-        input_ids = self.encode(caption)
-        attention_mask = (input_ids != self.pad_idx).float()
+        if self.eval:
+            captions = info['captions']  # return list of captions for evaluation
+            return {
+                'image': image,
+                'raw_captions': captions
+            }
+        else:
+            caption = random.choice(info['captions']) if info['captions'] else ""
+            input_ids = self.encode(caption)
+            attention_mask = (input_ids != self.pad_idx).float()
 
-        return {
-            'image': image,
-            'input_ids': input_ids,
-            'attention_mask': attention_mask,
-            'raw_caption': caption
-        }
+            return {
+                'image': image,
+                'input_ids': input_ids,
+                'attention_mask': attention_mask,
+                'raw_caption': caption
+            }
