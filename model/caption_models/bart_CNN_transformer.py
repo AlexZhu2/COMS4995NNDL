@@ -10,6 +10,7 @@ class CNNBARTCaptioningModel(nn.Module):
     def __init__(
         self,
         pretrained_model_name: str = "facebook/bart-base",
+        cnn_model_name: str = "efficientnetv2_s",
         embed_dim: int = 512,
         freeze_encoder: bool = True
     ):
@@ -23,7 +24,7 @@ class CNNBARTCaptioningModel(nn.Module):
         """
         super().__init__()
         # 1) Visual encoder
-        self.encoder = CNNEncoder(embed_dim=embed_dim, model_name="efficientnetv2_s")
+        self.encoder = CNNEncoder(embed_dim=embed_dim, model_name=cnn_model_name)
         
         # 2) Language decoder (BART under the hood)
         #    memory_dim must equal embed_dim
