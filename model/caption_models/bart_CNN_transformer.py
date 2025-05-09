@@ -23,7 +23,7 @@ class CNNBARTCaptioningModel(nn.Module):
         """
         super().__init__()
         # 1) Visual encoder
-        self.encoder = CNNEncoder(embed_dim=embed_dim)
+        self.encoder = CNNEncoder(embed_dim=embed_dim, model_name="efficientnetv2_s")
         
         # 2) Language decoder (BART under the hood)
         #    memory_dim must equal embed_dim

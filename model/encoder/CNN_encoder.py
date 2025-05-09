@@ -1,45 +1,54 @@
 import torch.nn as nn
 import torchvision.models as models
-from torchvision.models import ResNet50_Weights
+from torchvision.models import (
+    ResNet50_Weights,
+    EfficientNet_V2_S_Weights
+)
 
 class CNNEncoder(nn.Module):
-    def __init__(self, embed_dim=512):
+    def __init__(self, model_name="resnet50", embed_dim=512):
         """
         Args:
-            embed_dim (int): Dimension of the output feature vectors (matches Transformer d_model)
-            pretrained (bool): Whether to use a pretrained CNN backbone
+            model_name (str): Name of the backbone model. Options: "resnet50", "efficientnetv2_s"
+            embed_dim (int): Dimension of the output feature vectors
         """
         super(CNNEncoder, self).__init__()
         
-        # Load a pretrained ResNet50 model
-        resnet = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+        self.model_name = model_name.lower()
         
-        # Remove the final fully connected layer (we only want the feature maps)
-        self.backbone = nn.Sequential(*list(resnet.children())[:-2])  # up to the last conv layer
+        if self.model_name == "resnet50":
+            backbone = models.resnet50(weights=ResNet50_Weights.IMAGENET1K_V1)
+            out_channels = 2048
+            # Remove final fully connected + avgpool layers
+            self.backbone = nn.Sequential(*list(backbone.children())[:-2])
+            self.pool = nn.AdaptiveAvgPool2d((7, 7))
         
-        # Adaptive pooling to get a fixed size output (like 7x7 feature map)
-        self.adaptive_pool = nn.AdaptiveAvgPool2d((7, 7))
+        elif self.model_name == "efficientnetv2_s":
+            backbone = models.efficientnet_v2_s(weights=EfficientNet_V2_S_Weights.IMAGENET1K_V1)
+            out_channels = backbone.classifier[1].in_features  # Final feature dim before classifier
+            self.backbone = backbone.features  # Only use the feature extraction layers
+            self.pool = nn.AdaptiveAvgPool2d((7, 7))  # Same output spatial size
         
-        # Project CNN output to Transformer embedding dimension
-        self.conv_proj = nn.Conv2d(2048, embed_dim, kernel_size=1)
+        else:
+            raise ValueError(f"Unsupported model name: {model_name}")
+        
+        # Projection layer to map backbone output to embed_dim
+        self.conv_proj = nn.Conv2d(out_channels, embed_dim, kernel_size=1)
         
     def forward(self, images):
         """
         Args:
-            images: tensor of shape (batch_size, 3, 224, 224)
-            
+            images: Tensor of shape (batch_size, 3, H, W)
         Returns:
-            features: tensor of shape (batch_size, num_patches, embed_dim)
+            features: Tensor of shape (batch_size, num_patches, embed_dim)
         """
-        # Extract feature maps
-        features = self.backbone(images)        # (batch_size, 2048, H/32, W/32), typically (batch_size, 2048, 7, 7)
-        
-        features = self.adaptive_pool(features) # (batch_size, 2048, 7, 7) if not already
-        features = self.conv_proj(features)     # (batch_size, embed_dim, 7, 7)
+        features = self.backbone(images)  # shape: (B, C, H_feat, W_feat)
+        features = self.pool(features)    # shape: (B, C, 7, 7)
+        features = self.conv_proj(features)  # shape: (B, embed_dim, 7, 7)
         
         # Flatten spatial dimensions
-        batch_size, embed_dim, h, w = features.size()
-        features = features.view(batch_size, embed_dim, h * w)    # (batch_size, embed_dim, 49)
-        features = features.permute(0, 2, 1)                      # (batch_size, 49, embed_dim)
+        B, embed_dim, H, W = features.shape
+        features = features.view(B, embed_dim, H * W)  # (B, embed_dim, 49)
+        features = features.permute(0, 2, 1)           # (B, 49, embed_dim)
         
         return features
