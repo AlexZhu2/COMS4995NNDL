@@ -71,7 +71,7 @@ class CNNBARTCaptioningModel(nn.Module):
         images: torch.Tensor,
         max_length: int = 35,
         num_beams: int = 4
-    ) -> torch.LongTensor:
+    ):
         """
         Inference‐time generation (beam search) using BART’s .generate(...)
         
@@ -89,7 +89,7 @@ class CNNBARTCaptioningModel(nn.Module):
         enc_out = BaseModelOutput(last_hidden_state=proj)              # wrap for HF API
         
         # 2) call BART’s generation
-        return self.decoder.bart.generate(
+        gen_out = self.decoder.bart.generate(
             input_ids       = None,
             encoder_outputs = enc_out,
             max_length      = max_length,
@@ -99,3 +99,5 @@ class CNNBARTCaptioningModel(nn.Module):
             output_attentions = True,
             return_dict_in_generate = True,
         )
+        
+        return gen_out
