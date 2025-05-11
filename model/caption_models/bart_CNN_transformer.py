@@ -56,14 +56,14 @@ class CNNBARTCaptioningModel(nn.Module):
         memory = self.encoder(images)
         
         # 2) decode with BART’s decoder
-        logits = self.decoder(
+        logits, cross_attns = self.decoder(
             tgt_ids               = captions,
             memory                = memory,
             memory_attention_mask = memory_attention_mask,
             use_cache             = False,
             decoder_attention_mask=decoder_attention_mask
         )
-        return logits
+        return logits, cross_attns
 
     @torch.no_grad()
     def generate(
@@ -96,4 +96,6 @@ class CNNBARTCaptioningModel(nn.Module):
             num_beams       = num_beams,
             eos_token_id    = self.decoder.bart.config.eos_token_id,
             pad_token_id    = self.decoder.bart.config.pad_token_id,
+            output_attentions = True,
+            return_dict_in_generate = True,
         )

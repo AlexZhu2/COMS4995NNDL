@@ -49,11 +49,16 @@ class TransformerDecoder(nn.Module):
             attention_mask=decoder_attention_mask,   # ← now guaranteed to exist
             encoder_hidden_states=memory,
             encoder_attention_mask=memory_attention_mask,
-            use_cache=use_cache
+            use_cache=use_cache,
+            output_attentions=True,
+            return_dict=True 
         )
+
+        # get cross attention for attention mapping
+        cross_attns = dec_out.cross_attentions
 
         # d) project to vocab
         hidden_states = dec_out.last_hidden_state
         logits = self.bart.lm_head(hidden_states)
 
-        return (logits, dec_out.past_key_values) if use_cache else logits
+        return (logits, dec_out.past_key_values, cross_attns) if use_cache else (logits, cross_attns)
