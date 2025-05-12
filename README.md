@@ -2,10 +2,6 @@
 
 This repository contains the implementation of a CNN-Transformer architecture for image captioning, combining a CNN-based visual encoder with a BART-based language decoder, along with attention map visualization and analysis of cross-attention between image regions and generated tokens.
 
-## Paper
-
-Zhu et al., "Image Captioning with CNN and Transformer Decoder: A Modern Take on 'Show and Tell'", NeurIPS 2023. See [nndl.pdf](nndl.pdf) for the full paper.
-
 ## Annotations
 Annotation json files for both training and validation set can be found at [Here](http://images.cocodataset.org/annotations/annotations_trainval2017.zip). We will retrieve images via Internet, no need to download the actual image dataset.
 
