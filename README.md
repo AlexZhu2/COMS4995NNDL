@@ -189,15 +189,9 @@ This script outputs predicted captions along with PNG files visualizing cross-at
 
 ## Evaluation
 
-Quantitative evaluation on the COCO validation set can be run via:
-
-```bash
-python evaluate.py \
-  --predictions outputs/predictions.json \
-  --references /path/to/coco/annotations/captions_val2017.json
-```
-
-Metrics reported: BLEU-4 and METEOR.
+Lastly we present our metrics evaluation on **BLEU-4** and **METEOR**, similarly, please view our final report for more detailed analysis.
+- **EfficientNetV2 S + BART**: BLEU-4 = 0.2772, METEOR = 0.4298
+- **ResNet-50 + BART**: BLEU-4 = 0.2686, METEOR = 0.4260
 
 ## Results
 Here are some visualizations of the outputs of the models
@@ -211,7 +205,3 @@ We also have training and validation losses
 In addition to the visualization, we explored attention maps to better understand how the model focuses on different regions of the input when generating predictions. More detailed analysis can be found in our final report.
 
 ![Attention](resources/attention.png)
-
-Lastly we present our metrics evaluation on **BLEU-4** and **METEOR**, similarly, please view our final report for more detailed analysis.
-- **EfficientNetV2 S + BART**: BLEU-4 = 0.2772, METEOR = 0.4298
-- **ResNet-50 + BART**: BLEU-4 = 0.2686, METEOR = 0.4260
